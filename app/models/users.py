@@ -23,7 +23,7 @@ class User:
 
     def get_dictionary(self):
         return{
-            "user_id": len(users) + 1,
+            # "user_id": len(users) + 1,
             "firstname": self.firstname,
             "lastname": self.lastname,
             "othernames": self.othernames,
@@ -32,6 +32,6 @@ class User:
             "username": self.username,
             "date": datetime.datetime.now(),
             "isAdmin": False,
-            "user_name": self.username,
+           
             "password": self.password
         }

@@ -1,4 +1,6 @@
 from app.models.incident import Incident, incidents
+from app.models.users import User
+
 from flask import Flask, jsonify, request, json
 from ..db import DatabaseConnection
 
@@ -30,13 +32,19 @@ class Redflag():
         self.isAdmin = args[6]
         self.password = args[7]
 
-        incident = Incident(*args)
+        users = User(*args)
+
+
+            #     query = ("INSERT INTO menu(name, description, price)\
+            # VALUES('{}', '{}', '{}')\
+            # RETURNING foodId, name, description, price")
 
         query = "INSERT INTO usersoosi (firstname, lastname, othernames, email, \
                 phoneNumber, username, isAdmin, password) \
                 VALUES ('{}', '{}', '{}','{}', '{}', '{}','{}', False);".format(self.firstname, self.lastname, self.othernames, self.email, self.phoneNumber, self.username, self.isAdmin, self.password)
         db.cursor.execute(query)
-        newinput_display = incident.get_json()
+        # newinput_display = self.fetch_ones(self.username)
+        newinput_display = users.get_dictionary()
         return newinput_display
 
     # def validate_input(self, createdby, location,redflag, intervention):
@@ -60,8 +68,11 @@ class Redflag():
     #     elif not location or location.isspace():
     #         return 'Email field can not be left empty.'
 
-    def get_allredflags(self):
-        return incidents
+    def get_allusers(self):
+        query = "SELECT * FROM usersoosi"
+        db.cursor.execute(query)
+        users = db.cursor.fetchall()
+        return users
 
     def get_a_redflag(self, redflag_id):
         record = [
@@ -74,6 +85,45 @@ class Redflag():
 
         return jsonify({"message": "the record_id is not available"})
 
+    def login(self, username, password):
+        query = "SELECT * FROM usersoosi WHERE username='{}';".format(username)
+        db.cursor.execute(query)
+        user_details = db.cursor.fetchone() 
+        if user_details:
+            
+            if user_details['password'] == password:
+                return user_details
+            return {"error":"wrong email credentials"}
+        return {"error":"wrong login credentials"}
+        # if user_details['email'] == email:
+        #     return user_details
+        # return {"message":"that person with that id aint here baby"}
+
+        
+        # if user_details['password'] == password and user_details['username'] == username:
+        #     return {"message":"you have successfully logged in"}
+        # return {"error":"enter a right username and password"}
+
+    def fetch_one(self, userid):
+        query = "SELECT * FROM usersoosi WHERE userid={};".format(userid)
+        db.cursor.execute(query)
+        user_details = db.cursor.fetchall()
+     
+        return user_details
+
+    def fetch_ones(self, username):
+        query = "SELECT * FROM usersoosi WHERE username='{}';".format(username)
+        db.cursor.execute(query)
+        user_details = db.cursor.fetchall()
+     
+        return user_details
+    
+    # def fetch_one(self, username):
+    #     query = "SELECT * FROM usersoosi WHERE username={};".format(username)
+    #     db.cursor.execute(query)
+    #     user_details = db.cursor.fetchall()
+     
+        return user_details
     def edit_record(self, redflag_id):
         data = request.get_json(['location'])
         for redflag in incidents:

@@ -1,5 +1,0 @@
-   dbname=ireporter, 
-   user='postgres', 
-   host='localhost', 
-   password='text', 
-   port=5432
